@@ -247,7 +247,7 @@ def get_room(coords, level):
             can_up = False
             can_down = False
         elif coords == [4,4]:
-            roomID = "cactus_room"
+            roomID = "cactus_room1"
             can_north = True
             can_south = True
             can_east = False
@@ -335,10 +335,97 @@ def get_room(coords, level):
             can_east = False
             can_west = True
 
+def look():
+    global roomID
+    if roomID == "bed":
+        print("It's your bedroom. Cat bed, water dish, toy mouse.")
+    elif roomID == "dungeon":
+        print("It's the dungeon outside your bedroom.")
+    elif roomID == "bathroom":
+        print("Just the bathroom.")
+    elif roomID == "hallway1":
+        print("The hallway leading out of the dungeon. Suits of armor line the walls.")
+    elif roomID == "hallway2":
+        print("The middle of the long hallway in CAT CASTLE.")
+    elif roomID == "closet":
+        print("It's a closet. It's just full of cleaning supplies but something about it seems fishy.")
+    elif roomID == "secret_chamber":
+        print("Of course there was a secret chamber behind the closet.")
+    elif roomID == "hallway3":
+        print("The north end of the long hallway in CAT CASTLE. There's a big spooky cat banner on the wall.")
+    elif roomID == "armory":
+        print("It's the armory! Big piles of swords and armor everywhere. Rad.")
+    elif roomID == "cat_tree1":
+        print("It's the castle cat tree! Seems like a good place to take a nap.")
+    elif roomID == "shop1":
+        print("It's the shop. Why does CAT CASTLE have a shop?")
+    elif roomID == "stairs1":
+        print("The stairs leading up to the LABYRINTH OF MISERY.")
+    #second floor
+    elif roomID == "stairs2":
+        print("These stairs lead back down to CAT CASTLE")
+    elif roomID == "maze":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze1":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze2":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze3":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze4":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze5":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze6":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze7":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze8":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "maze9":
+        print("It's the labyrinth of misery. It feels endless.")
+    elif roomID == "owl_room1":
+        print("There's a giant owl here. It looks like it has a lot to say.")
+    elif roomID == "trap_room":
+        print("This room looks really suspicious.")
+    elif roomID == "scratch_post":
+        print("There's a giant scratching post here. It looks so inviting.")
+    elif roomID == "shop2":
+        print("There's a shop here. Why is there a shop in the LABYRINTH OF MISERY?")
+    elif roomID == "cat_tree2":
+        print("There's another cat tree here. Looks comfy, if a little damp.")
+    elif roomID == "key_room":
+        print("There's a big chest here.")
+    elif roomID == "cactus_room1":
+        print("This room is full of cacti. They look dangerous.")
+    elif roomID == "cactus2":
+        print("More cacti here.")
+    elif roomID == "stairs3":
+        print("These stairs lead to HELL KITCHEN, where your food bowl awaits.")
+    #third floor
+    elif roomID == "stairs4":
+        print("These stairs lead down to the LABYRINTH OF MISERY. blegh")
+    elif roomID == "owl_room2":
+        print("There's another giant owl here.")
+    elif roomID == "shop3":
+        print("It's another shop. Why is there a shop in HELL KITCHEN?")
+    elif roomID == "trial1":
+        print("There's a sphinx here. It looks hungry.")
+    elif roomID == "trial2":
+        print("There's a bunch of bones lying around.")
+    elif roomID == "trial3":
+        print("There's some other kind of trial here (lol)")
+    elif roomID == "boss":
+        print("There's a human here ready to do battle.")
+    elif roomID == "food":
+        print("It's your dinner! You win!")
+   
+
 #start up scripts go here, e.g. title graphic, game_state = "new_game"
 game_state = "playing"
 player_coords = [3, 4]
 level = 1
+roomID = ""
 can_north = False
 can_south = False
 can_east = False
@@ -356,6 +443,7 @@ while game_state == "playing":
             player_coords[1] -= 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
+            look()
         else:
             print("Can't go that way.")
 
@@ -364,6 +452,7 @@ while game_state == "playing":
             player_coords[1] += 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
+            look()
         else:
             print("Can't go that way.")
 
@@ -372,6 +461,7 @@ while game_state == "playing":
             player_coords[0] -= 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
+            look()
         else:
             print("Can't go that way.")
 
@@ -380,6 +470,7 @@ while game_state == "playing":
             player_coords[0] += 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
+            look()
         else:
             print("Can't go that way.")
     
@@ -388,6 +479,7 @@ while game_state == "playing":
             level += 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
+            look()
         else:
             print("Can't go that way.")
     
@@ -396,5 +488,6 @@ while game_state == "playing":
             level -= 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
+            look()
         else:
             print("Can't go that way.")
