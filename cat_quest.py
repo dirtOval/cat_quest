@@ -236,7 +236,9 @@ def look():
         print("There's a human here ready to do battle.")
     elif current_room.roomID == "food":
         print("It's your dinner! You win!")
-    
+    #say what items are here
+    if len(current_room.items) != 0:
+        print("Items: {}".format(current_room.items))
     #tell players where they can go
     dir = ""
     if current_room.can_north:
@@ -253,9 +255,44 @@ def look():
         dir += " D"
     print("You can go:" + dir)
     
+def get_item(id):
+    global inventory
+    if not id in str(current_room.items):
+        print("There's no {} here.".format(id))
+    else:
+        if id == "potion":
+            inventory.append(potion)
+            current_room.items.remove(potion)
+        print("got {}!".format(id))
+
+def use_item(id):
+    global inventory
+    global HP
+    global HP_max
+    if not id in str(inventory):
+        print("You don't have {}".format(id))
+    else:
+        if id == "potion":
+            HP_max = HP
+            HP += 10
+            print("potion used")
+            if HP > HP_max:
+                HP = HP_max
+                print("Full health!")
+            else:
+                print("healed 10 HP")
+            inventory.remove(potion)
+            
+
+
+
+#items go here
+potion = Item("potion", 50)
+
+
 # Room objects go here: (roomID, north, south, east, west, up, down, items)
 #level 1
-bed = Room("bed", False, False, False, True, False, False, [Item("potion", 50)])
+bed = Room("bed", False, False, False, True, False, False, [potion])
 dungeon = Room("dungeon", True, True, True, False, False, False)
 bathroom = Room("bathroom", True, False, False, False, False, False)
 hallway1 = Room("hallway1", True, True, False, False, False, False)
@@ -301,12 +338,12 @@ food = Room("food", False, False, False, False)
 shop3 = Room("shop3", False, False, False, True)
 
 
-
-
 #start up scripts go here, e.g. title graphic, game_state = "new_game"
 game_state = "playing"
 player_coords = [3, 4]
-inventory = [Item("potion", 50)]
+HP = 10
+HP_max = 10
+inventory = [potion]
 equip = {"Weapon": None, "Armor": None, "Accessory": None}
 level = 1
 current_room = None
@@ -314,7 +351,7 @@ get_room(player_coords, level)
 look()
 # while loops go here
 while game_state == "playing":
-    doing = input(":")
+    doing = input("HP {}:".format(HP))
 
     if doing == "north" or doing == "n":
         if current_room.can_north == True:
@@ -375,3 +412,17 @@ while game_state == "playing":
     
     elif doing == "look" or doing == "l":
         look()
+
+    elif "get" in doing:
+        tag = doing.split()
+        if len(tag) == 1:
+            print("Get what?")
+        else:
+            get_item(tag[1])
+    
+    elif "use" in doing:
+        tag = doing.split()
+        if len(tag) == 1:
+            print("Use what?")
+        else:
+            use_item(tag[1])
