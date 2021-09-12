@@ -3,443 +3,321 @@
 
 
 #class & function defs go here
+
+class Item:
+    def __init__(self, id, value, equippable=False):
+        self.id = id
+        self.value = value
+        self.equippable = equippable
+    def __repr__(self):
+        return self.id
+
+class Room:
+    def __init__(self, roomID, can_north, can_south, can_east, can_west, can_up=False, can_down=False, items=[], visited = False):
+        self.roomID = roomID
+        self.items = items
+        self.can_north = can_north
+        self.can_south = can_south
+        self.can_east = can_east
+        self.can_west = can_west
+        self.can_up = can_up
+        self.can_down = can_down
+        self.visited = False
+    def __repr__(self, roomID):
+        return self.roomID
+
 def get_room(coords, level):
-    global can_north
-    global can_south
-    global can_east
-    global can_west
-    global can_up
-    global can_down
-    global roomID
+    global current_room
     if level == 1:
         if coords == [3, 4]:
-            roomID = "bed"
-            can_north = False
-            can_south = False
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = bed
+
         elif coords == [2, 4]:
-            roomID = "dungeon"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = dungeon
+
         elif coords == [2, 5]:
-            roomID = "bathroom"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = bathroom
+
         elif coords == [2, 3]:
-            roomID = "hallway1"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = hallway1
+            
         elif coords == [2, 2]:
-            roomID = "hallway2"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = hallway2
+            
         elif coords == [1, 2]:
-            roomID = "closet"
-            can_north = False
-            can_south = False
-            can_east = True
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = closet
+            
         elif coords == [0, 2]:
-            roomID = "secret_chamber"
-            can_north = False
-            can_south = False
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = secret_chamber
+            
         elif coords == [2, 1]:
-            roomID = "hallway3"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = hallway3
+            
         elif coords == [3, 1]:
-            roomID = "armory"
-            can_north = False
-            can_south = False
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = armory
+            
         elif coords == [2, 0]:
-            roomID = "cat_tree1"
-            can_north = False
-            can_south = True
-            can_east = True
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = cat_tree1
+            
         elif coords == [3, 0]:
-            roomID = "shop1"
-            can_north = False
-            can_south = False
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = shop1
+            
         elif coords == [1, 0]:
-            roomID = "stairs1"
-            can_north = False
-            can_south = False
-            can_east = True
-            can_west = False
-            can_up = True
-            can_down = False
+            current_room = stairs1
 
     elif level == 2:
         if coords == [1,0]:
-            roomID = "stairs2"
-            can_north = False
-            can_south = True
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = True
+            current_room = stairs2
+
         elif coords == [2,0]:
-            roomID = "maze1"
-            can_north = False
-            can_south = True
-            can_east = True
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = maze1
+            
         elif coords == [3,0]:
-            roomID = "maze3"
-            can_north = False
-            can_south = True
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = maze3
+            
         elif coords == [1,1]:
-            roomID = "maze2"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = maze2
+            
         elif coords == [2,1]:
-            roomID = "owl_room1"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = owl_room1
+            
         elif coords == [3,1]:
-            roomID = "maze4"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = maze4
+            
         elif coords == [4,1]:
-            roomID = "trap_room"
-            can_north = False
-            can_south = True
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = trap_room
+            
         elif coords == [1,2]:
-            roomID = "maze5"
-            can_north = True
-            can_south = False
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = maze5
+            
         elif coords == [2,2]:
-            roomID = "maze6"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = maze6
+            
         elif coords == [3,2]:
-            roomID = "scratch_post"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = scratch_post
+            
         elif coords == [4,2]:
-            roomID = "maze7"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = maze7
+            
         elif coords == [2,3]:
-            roomID = "maze8"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = maze8
+            
         elif coords == [3,3]:
-            roomID = "maze9"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = maze9
+            
         elif coords == [4,3]:
-            roomID = "maze"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = maze
+            
         elif coords == [1,4]:
-            roomID = "shop2"
-            can_north = False
-            can_south = False
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = shop2
+            
         elif coords == [2,4]:
-            roomID = "cat_tree2"
-            can_north = True
-            can_south = False
-            can_east = True
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = cat_tree2
+            
         elif coords == [3,4]:
-            roomID = "key_room1"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = key_room1
+            
         elif coords == [4,4]:
-            roomID = "cactus_room1"
-            can_north = True
-            can_south = True
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = cactus_room1
+            
         elif coords == [3, 5]:
-            roomID = "stairs3"
-            can_north = False
-            can_south = False
-            can_east = True
-            can_west = False
-            can_up = True
-            can_down = False
+            current_room = stairs3
+            
         elif coords == [4, 5]:
-            roomID = "cactus2"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = True
-            can_up = False
-            can_down = False
+            current_room = cactus2
 
     elif level == 3:
         if coords == [3,5]:
-            roomID = "stairs4"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = True
+            current_room = stairs4
+            
         elif coords == [3,4]:
-            roomID = "owl_room2"
-            can_north = True
-            can_south = True
-            can_east = True
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = owl_room2
+            
         elif coords == [3,3]:
-            roomID = "trial1"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = trial1
+            
         elif coords == [3,2]:
-            roomID = "trial2"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = trial2
+            
         elif coords == [3,1]:
-            roomID = "trial3"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = trial3
+
         elif coords == [3,0]:
-            roomID = "boss"
-            can_north = True
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = boss
+            
         elif coords == [3,-1]:
-            roomID = "food"
-            can_north = False
-            can_south = False
-            can_east = False
-            can_west = False
-            can_up = False
-            can_down = False
+            current_room = food
+            
         elif coords == [4,4]:
-            roomID = "shop3"
-            can_north = False
-            can_south = False
-            can_east = False
-            can_west = True
+            current_room = shop3
 
 def look():
     global roomID
-    if roomID == "bed":
+    global room_item
+    if current_room.roomID == "bed":
         print("It's your bedroom. Cat bed, water dish, toy mouse.")
-    elif roomID == "dungeon":
+    elif current_room.roomID == "dungeon":
         print("It's the dungeon outside your bedroom.")
-    elif roomID == "bathroom":
+    elif current_room.roomID == "bathroom":
         print("Just the bathroom.")
-    elif roomID == "hallway1":
+    elif current_room.roomID == "hallway1":
         print("The hallway leading out of the dungeon. Suits of armor line the walls.")
-    elif roomID == "hallway2":
+    elif current_room.roomID == "hallway2":
         print("The middle of the long hallway in CAT CASTLE.")
-    elif roomID == "closet":
+    elif current_room.roomID == "closet":
         print("It's a closet. It's just full of cleaning supplies but something about it seems fishy.")
-    elif roomID == "secret_chamber":
+    elif current_room.roomID == "secret_chamber":
         print("Of course there was a secret chamber behind the closet.")
-    elif roomID == "hallway3":
+    elif current_room.roomID == "hallway3":
         print("The north end of the long hallway in CAT CASTLE. There's a big spooky cat banner on the wall.")
-    elif roomID == "armory":
+    elif current_room.roomID == "armory":
         print("It's the armory! Big piles of swords and armor everywhere. Rad.")
-    elif roomID == "cat_tree1":
+    elif current_room.roomID == "cat_tree1":
         print("It's the castle cat tree! Seems like a good place to take a nap.")
-    elif roomID == "shop1":
+    elif current_room.roomID == "shop1":
         print("It's the shop. Why does CAT CASTLE have a shop?")
-    elif roomID == "stairs1":
+    elif current_room.roomID == "stairs1":
         print("The stairs leading up to the LABYRINTH OF MISERY.")
     #second floor
-    elif roomID == "stairs2":
+    elif current_room.roomID == "stairs2":
         print("These stairs lead back down to CAT CASTLE")
-    elif roomID == "maze":
+    elif current_room.roomID == "maze":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze1":
+    elif current_room.roomID == "maze1":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze2":
+    elif current_room.roomID == "maze2":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze3":
+    elif current_room.roomID == "maze3":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze4":
+    elif current_room.roomID == "maze4":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze5":
+    elif current_room.roomID == "maze5":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze6":
+    elif current_room.roomID == "maze6":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze7":
+    elif current_room.roomID == "maze7":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze8":
+    elif current_room.roomID == "maze8":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "maze9":
+    elif current_room.roomID == "maze9":
         print("It's the labyrinth of misery. It feels endless.")
-    elif roomID == "owl_room1":
+    elif current_room.roomID == "owl_room1":
         print("There's a giant owl here. It looks like it has a lot to say.")
-    elif roomID == "trap_room":
+    elif current_room.roomID == "trap_room":
         print("This room looks really suspicious.")
-    elif roomID == "scratch_post":
+    elif current_room.roomID == "scratch_post":
         print("There's a giant scratching post here. It looks so inviting.")
-    elif roomID == "shop2":
+    elif current_room.roomID == "shop2":
         print("There's a shop here. Why is there a shop in the LABYRINTH OF MISERY?")
-    elif roomID == "cat_tree2":
+    elif current_room.roomID == "cat_tree2":
         print("There's another cat tree here. Looks comfy, if a little damp.")
-    elif roomID == "key_room":
+    elif current_room.roomID == "key_room":
         print("There's a big chest here.")
-    elif roomID == "cactus_room1":
+    elif current_room.roomID == "cactus_room1":
         print("This room is full of cacti. They look dangerous.")
-    elif roomID == "cactus2":
+    elif current_room.roomID == "cactus2":
         print("More cacti here.")
-    elif roomID == "stairs3":
+    elif current_room.roomID == "stairs3":
         print("These stairs lead to HELL KITCHEN, where your food bowl awaits.")
     #third floor
-    elif roomID == "stairs4":
+    elif current_room.roomID == "stairs4":
         print("These stairs lead down to the LABYRINTH OF MISERY. blegh")
-    elif roomID == "owl_room2":
+    elif current_room.roomID == "owl_room2":
         print("There's another giant owl here.")
-    elif roomID == "shop3":
+    elif current_room.roomID == "shop3":
         print("It's another shop. Why is there a shop in HELL KITCHEN?")
-    elif roomID == "trial1":
+    elif current_room.roomID == "trial1":
         print("There's a sphinx here. It looks hungry.")
-    elif roomID == "trial2":
+    elif current_room.roomID == "trial2":
         print("There's a bunch of bones lying around.")
-    elif roomID == "trial3":
+    elif current_room.roomID == "trial3":
         print("There's some other kind of trial here (lol)")
-    elif roomID == "boss":
+    elif current_room.roomID == "boss":
         print("There's a human here ready to do battle.")
-    elif roomID == "food":
+    elif current_room.roomID == "food":
         print("It's your dinner! You win!")
-   
+    
+    #tell players where they can go
+    dir = ""
+    if current_room.can_north:
+        dir += " N"
+    if current_room.can_south:
+        dir += " S"
+    if current_room.can_east:
+        dir += " E"
+    if current_room.can_west:
+        dir += " W"
+    if current_room.can_up:
+        dir += " U"
+    if current_room.can_down:
+        dir += " D"
+    print("You can go:" + dir)
+    
+# Room objects go here: (roomID, north, south, east, west, up, down, items)
+#level 1
+bed = Room("bed", False, False, False, True, False, False, [Item("potion", 50)])
+dungeon = Room("dungeon", True, True, True, False, False, False)
+bathroom = Room("bathroom", True, False, False, False, False, False)
+hallway1 = Room("hallway1", True, True, False, False, False, False)
+hallway2 = Room("hallway2", True, True, False, False, False, False)
+closet = Room("closet", False, False, True, True, False, False)
+secret_chamber = Room("secret_chamber", False, False, True, False, False, False)
+hallway3 = Room("hallway3", True, True, True, False, False, False)
+armory = Room("armory", False, False, False, True, False, False)
+cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
+shop1 = Room("shop1", False, False, False, True, False, False)
+stairs1 = Room("stairs1", False, False, True, False, True, False)
+
+#level2
+stairs2 = Room("stairs2", False, True, True, False, False, True)
+maze1 = Room("maze1", False, True, True, True)
+maze3 = Room("maze3", False, True, False, True)
+maze2 = Room("maze2", True, True, True, False)
+owl_room1 = Room("owl_room1", True, True, True, True)
+maze4 = Room("maze4", True, True, True, True)
+trap_room = Room("trap_room", False, True, False, True)
+maze5 = Room("maze5", True, False, True, False)
+maze6 = Room("maze6", True, True, False, True)
+scratch_post = Room("scratch_post", True, True, True, False)
+maze7 = Room("maze7", True, True, False, True)
+maze8 = Room("maze8", True, True, False, False)
+maze9 = Room("maze9", True, True, False, False)
+maze = Room("maze", True, True, False, False)
+shop2 = Room("shop2", False, False, True, False)
+cat_tree2 = Room("cat_tree2", True, False, True, True)
+key_room1 = Room("key_room1", True, False, False, True)
+cactus_room1 = Room("cactus_room1", True, True, False, False)
+stairs3 = Room("stairs3", False, False, True, False, True, False)
+cactus2 = Room("cactus2", True, False, False, True)
+
+#level3
+stairs4 = Room("stairs4", True, False, False, False, False, True)
+owl_room2 = Room("owl_room2", True, True, True, False)
+trial1 = Room("trial1", True, False, False, False)
+trial2 = Room("trial2", True, False, False, False)
+trial3 = Room("trial3", True, False, False, False)
+boss = Room("boss", True, False, False, False)
+food = Room("food", False, False, False, False)
+shop3 = Room("shop3", False, False, False, True)
+
+
+
 
 #start up scripts go here, e.g. title graphic, game_state = "new_game"
 game_state = "playing"
 player_coords = [3, 4]
+inventory = [Item("potion", 50)]
+equip = {"Weapon": None, "Armor": None, "Accessory": None}
 level = 1
-roomID = ""
-can_north = False
-can_south = False
-can_east = False
-can_west = False
-can_up = False
-can_down = False
+current_room = None
 get_room(player_coords, level)
-
+look()
 # while loops go here
 while game_state == "playing":
     doing = input(":")
 
     if doing == "north" or doing == "n":
-        if can_north == True:
+        if current_room.can_north == True:
             player_coords[1] -= 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
@@ -448,7 +326,7 @@ while game_state == "playing":
             print("Can't go that way.")
 
     elif doing == "south" or doing == "s":
-        if can_south == True:
+        if current_room.can_south == True:
             player_coords[1] += 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
@@ -457,7 +335,7 @@ while game_state == "playing":
             print("Can't go that way.")
 
     elif doing == "west" or doing == "w":
-        if can_west == True:
+        if current_room.can_west == True:
             player_coords[0] -= 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
@@ -466,7 +344,7 @@ while game_state == "playing":
             print("Can't go that way.")
 
     elif doing == "east" or doing == "e":
-        if can_east == True:
+        if current_room.can_east == True:
             player_coords[0] += 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
@@ -475,7 +353,7 @@ while game_state == "playing":
             print("Can't go that way.")
     
     elif doing == "up" or doing == "u":
-        if can_up == True:
+        if current_room.can_up == True:
             level += 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
@@ -484,10 +362,16 @@ while game_state == "playing":
             print("Can't go that way.")
     
     elif doing == "down" or doing == "d":
-        if can_down == True:
+        if current_room.can_down == True:
             level -= 1
             get_room(player_coords, level)
             print("new coords: {}".format(player_coords))
             look()
         else:
             print("Can't go that way.")
+
+    elif doing == "inventory" or doing == "inv":
+        print(inventory)
+    
+    elif doing == "look" or doing == "l":
+        look()
