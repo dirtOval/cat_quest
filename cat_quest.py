@@ -112,7 +112,7 @@ class Room:
         self.can_west = can_west
         self.can_up = can_up
         self.can_down = can_down
-        self.visited = False
+        self.visited = visited
     def __repr__(self, roomID):
         return self.roomID
 
@@ -403,9 +403,12 @@ def update_attack():
     global ATK_bonus
     global WPN_bonus
     global ATK_effect
-    ATK_bonus = WPN_bonus + ATK_effect
-    print("WPN {} + BONUS {} = ATK Bonus: {}".format(WPN_bonus, ATK_effect, ATK_bonus))
+    global STR
+    ATK_bonus = WPN_bonus + ATK_effect + STR
 
+def update_HP_total():
+    global HP_max
+    HP_max = 1 + (3 * CON)
 
 #item objects go here
 potion = Item("potion", 50)
@@ -468,115 +471,163 @@ shop3 = Room("shop3", False, False, False, True)
 #start up scripts go here, e.g. title graphic, game_state = "new_game"
 game_state = "playing"
 player_coords = [3, 4]
-HP = 10
-HP_max = 10
 WPN_bonus = 1
 ATK_effect = 0
-ATK_bonus = WPN_bonus + ATK_effect
+ATK_bonus = 0
 ARM = 0
 STR = 3
 CON = 3
 SPD = 3
 LVL = 1
 XP = 0
-inventory = [potion]
+update_attack()
+update_HP_total()
+HP = HP_max
+inventory = []
 equip = {"Weapon": stick, "Armor": None, "Accessory": None}
 floor = 1
 current_room = None
 get_room(player_coords, floor)
 look()
+game_running = True
+
+while game_running:
+
 # while loops go here
-while game_state == "playing":
-    doing = input(" HP {}/{}:".format(HP,HP_max))
-
-    if doing == "north" or doing == "n":
-        if current_room.can_north == True:
-            player_coords[1] -= 1
-            get_room(player_coords, floor)
-            print("new coords: {}".format(player_coords))
-            look()
-        else:
-            print("Can't go that way.")
-
-    elif doing == "south" or doing == "s":
-        if current_room.can_south == True:
-            player_coords[1] += 1
-            get_room(player_coords, floor)
-            print("new coords: {}".format(player_coords))
-            look()
-        else:
-            print("Can't go that way.")
-
-    elif doing == "west" or doing == "w":
-        if current_room.can_west == True:
-            player_coords[0] -= 1
-            get_room(player_coords, floor)
-            print("new coords: {}".format(player_coords))
-            look()
-        else:
-            print("Can't go that way.")
-
-    elif doing == "east" or doing == "e":
-        if current_room.can_east == True:
-            player_coords[0] += 1
-            get_room(player_coords, floor)
-            print("new coords: {}".format(player_coords))
-            look()
-        else:
-            print("Can't go that way.")
+    while game_state == "playing":
     
-    elif doing == "up" or doing == "u":
-        if current_room.can_up == True:
-            floor += 1
-            get_room(player_coords, floor)
-            print("new coords: {}".format(player_coords))
+        if XP >= 100 * LVL:
+            game_state = "level_up"
+    
+        doing = input(" HP {}/{}:".format(HP,HP_max))    
+        #control commands
+        if doing == "north" or doing == "n":
+            if current_room.can_north == True:
+                player_coords[1] -= 1
+                get_room(player_coords, floor)
+                print("new coords: {}".format(player_coords))
+                look()
+            else:
+                print("Can't go that way.")
+
+        elif doing == "south" or doing == "s":
+            if current_room.can_south == True:
+                player_coords[1] += 1
+                get_room(player_coords, floor)
+                print("new coords: {}".format(player_coords))
+                look()
+            else:
+                print("Can't go that way.")
+
+        elif doing == "west" or doing == "w":
+            if current_room.can_west == True:
+                player_coords[0] -= 1
+                get_room(player_coords, floor)
+                print("new coords: {}".format(player_coords))
+                look()
+            else:
+                print("Can't go that way.")
+
+        elif doing == "east" or doing == "e":
+            if current_room.can_east == True:
+                player_coords[0] += 1
+                get_room(player_coords, floor)
+                print("new coords: {}".format(player_coords))
+                look()
+            else:
+                print("Can't go that way.")
+    
+        elif doing == "up" or doing == "u":
+            if current_room.can_up == True:
+                floor += 1
+                get_room(player_coords, floor)
+                print("new coords: {}".format(player_coords))
+                look()
+            else:
+                print("Can't go that way.")
+    
+        elif doing == "down" or doing == "d":
+            if current_room.can_down == True:
+                floor -= 1
+                get_room(player_coords, floor)
+                print("new coords: {}".format(player_coords))
+                look()
+            else:
+                print("Can't go that way.")
+
+        elif doing == "inventory" or doing == "inv":
+            print(inventory)
+            if equip["Weapon"] == None:
+                wpn = "Weapon: None |"
+            else:
+                wpn = "Weapon: " + str(equip["Weapon"]) + " (+{})".format(equip["Weapon"].bonus) + " |"
+            if equip["Armor"] == None:
+                armr = " Armor: None |"
+            else:
+                armr = " Armor: " + str(equip["Armor"]) + " (+{})".format(equip["Armor"].bonus) + " |"
+            if equip["Accessory"] == None:
+                acc = " Accessory: None"
+            else:
+                acc = " Accessory: " + str(equip["Accessory"]) + " (+{})".format(equip["Accessory"].bonus)
+
+            print(wpn + armr + acc)
+    
+        elif doing == "character" or doing == "cha":
+            print("STR:", STR, "| CON:", CON, "| SPD:", SPD, "| ATK Bonus:", ATK_bonus, "| ARM:", ARM, "| LVL:", LVL, "| XP:", XP)
+
+
+        elif doing == "look" or doing == "l":
             look()
-        else:
-            print("Can't go that way.")
+
+        elif "get" in doing:
+            tag = doing.split()
+            if len(tag) == 1:
+                print("Get what?")
+            else:
+                get_item(tag[1])
     
-    elif doing == "down" or doing == "d":
-        if current_room.can_down == True:
-            floor -= 1
-            get_room(player_coords, floor)
-            print("new coords: {}".format(player_coords))
-            look()
-        else:
-            print("Can't go that way.")
+        elif "use" in doing:
+            tag = doing.split()
+            if len(tag) == 1:
+                print("Use what?")
+            else:
+                use_item(tag[1])
+        #TEST COMMANDS: REMOVE THESE LATER!!
+        elif "OP_giveXP" in doing:
+            tag = doing.split()
+            if len(tag) == 1:
+                print("how much xp?")
+            else:
+                XP += int(tag[1])
 
-    elif doing == "inventory" or doing == "inv":
-        print(inventory)
-        if equip["Weapon"] == None:
-            wpn = "Weapon: None |"
-        else:
-            wpn = "Weapon: " + str(equip["Weapon"]) + " (+{})".format(equip["Weapon"].bonus) + " |"
-        if equip["Armor"] == None:
-            armr = " Armor: None |"
-        else:
-            armr = " Armor: " + str(equip["Armor"]) + " (+{})".format(equip["Armor"].bonus) + " |"
-        if equip["Accessory"] == None:
-            acc = " Accessory: None"
-        else:
-            acc = " Accessory: " + str(equip["Accessory"]) + " (+{})".format(equip["Accessory"].bonus)
-
-        print(wpn + armr + acc)
+    while game_state == "level_up":
+        congrats = False
+        if congrats == False:
+            print("|~|LEVEL UP|~|")
+            print("Select Stat to upgrade:")
+            print("1. STR")
+            print("2. CON")
+            print("3. SPD")
+            
+        XP -= 100 * LVL
+        LVL += 1
+        choice = input(" HP {}/{}:".format(HP,HP_max))
+        if choice == "1":
+            STR += 1
+            print("STR Boosted!")
+            print("New STR: {}".format(STR))
+            update_attack()
+            game_state = "playing"
+        elif choice == "2":
+            CON += 1
+            print("CON Boosted!")
+            print("New CON: {}".format(CON))
+            update_HP_total()
+            game_state = "playing"
+        elif choice == "3":
+            SPD += 1
+            print("SPD Boosted!")
+            print("New SPD: {}".format(SPD))
+            game_state = "playing"
     
-    elif doing == "character" or doing == "cha":
-        print("STR:", STR, "| CON:", CON, "| SPD:", SPD, "| ATK Bonus:", ATK_bonus, "| ARM:", ARM, "| LVL:", LVL, "| XP:", XP)
-
-
-    elif doing == "look" or doing == "l":
-        look()
-
-    elif "get" in doing:
-        tag = doing.split()
-        if len(tag) == 1:
-            print("Get what?")
-        else:
-            get_item(tag[1])
     
-    elif "use" in doing:
-        tag = doing.split()
-        if len(tag) == 1:
-            print("Use what?")
-        else:
-            use_item(tag[1])
