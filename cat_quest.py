@@ -1,8 +1,8 @@
 #libraries go here
+import random
 
 
-
-#class & function defs go here
+#classes
 
 class Item:
     def __init__(self, id, value,):
@@ -116,6 +116,18 @@ class Room:
     def __repr__(self, roomID):
         return self.roomID
 
+class Mob:
+    def __init__(self, ID, HP, STR, CON, SPD, XP):
+        self.ID = ID
+        self.HP = HP
+        self.STR = STR
+        self.CON = CON
+        self.SPD = SPD
+        self.XP = XP
+    def __repr__(self):
+        return self.ID
+
+#Functions
 def get_room(coords, floor):
     global current_room
     if floor == 1:
@@ -410,6 +422,102 @@ def update_HP_total():
     global HP_max
     HP_max = 1 + (3 * CON)
 
+def random_encounter_check():
+    global game_state
+    chance = random.randint(1, 100)
+    if chance >= 70:
+        print("RANDOM ENCOUNTER! TIME TO FIGHT!")
+        random_encounter()
+
+def random_encounter():
+    global floor
+    global enemies
+    global game_state
+    if floor == 1:
+        amount = random.randint(1, 3)
+        for num in range(1, amount+1):
+            enemies.append(dog)
+        game_state = "combat"
+        print("{} dogs appear, teeth bared!".format(amount))
+
+def player_attack(target):
+    global ATK_bonus
+    global WPN_bonus
+    global STR
+    global XP
+    roll = random.randint(1, 20) + ATK_bonus
+    if roll >= 10 + target.SPD:
+        damage = WPN_bonus + STR
+        target.HP -= damage
+        print("Did {} damage to {} ({} left)".format(damage, target, target.HP))
+        if target.HP <= 0:
+            print("{} died!".format(target))
+            print("Gained {} XP".format(target.XP))
+            XP += target.XP
+            enemies.remove(target)
+    else:
+        print("You missed!")
+
+def enemy_attack(attacker):
+    global HP
+    global SPD
+    for enemy in enemies:
+        roll = random.randint(1,20) + enemy.STR
+        if roll >= 10 + SPD:
+            damage = STR
+            print("{} did {} damage to you!".format(enemy, damage))
+            HP -= damage
+            death_check()
+        else:
+            print("{} attacked, but missed!".format(enemy))
+
+def death_check():
+    global game_state
+    if HP <= 0:
+        game_state = "game_over"
+
+def game_restart():
+    global game_state
+    global enemies
+    global WPN_bonus
+    global ATK_effect
+    global ATK_bonus
+    global ARM
+    global STR
+    global CON
+    global SPD
+    global LVL
+    global XP
+    global HP
+    global HP_max
+    global inventory
+    global equip
+    global current_room
+    game_state = "playing"
+    enemies = []
+    player_coords = [3, 4]
+    WPN_bonus = 1
+    ATK_effect = 0
+    ATK_bonus = 0
+    ARM = 0
+    STR = 3
+    CON = 3
+    SPD = 3
+    LVL = 1
+    XP = 0
+    update_attack()
+    update_HP_total()
+    HP = HP_max
+    inventory = []
+    equip = {"Weapon": stick, "Armor": None, "Accessory": None}
+    floor = 1
+    current_room = None
+    get_room(player_coords, floor)
+    look()
+
+#enemy objects go here
+dog = Mob("dog", 5, 3, 3, 3, 25)
+
 #item objects go here
 potion = Item("potion", 50)
 #weapons
@@ -470,6 +578,7 @@ shop3 = Room("shop3", False, False, False, True)
 
 #start up scripts go here, e.g. title graphic, game_state = "new_game"
 game_state = "playing"
+enemies = []
 player_coords = [3, 4]
 WPN_bonus = 1
 ATK_effect = 0
@@ -507,6 +616,7 @@ while game_running:
                 get_room(player_coords, floor)
                 print("new coords: {}".format(player_coords))
                 look()
+                random_encounter_check()
             else:
                 print("Can't go that way.")
 
@@ -516,6 +626,7 @@ while game_running:
                 get_room(player_coords, floor)
                 print("new coords: {}".format(player_coords))
                 look()
+                random_encounter_check()
             else:
                 print("Can't go that way.")
 
@@ -525,6 +636,7 @@ while game_running:
                 get_room(player_coords, floor)
                 print("new coords: {}".format(player_coords))
                 look()
+                random_encounter_check()
             else:
                 print("Can't go that way.")
 
@@ -534,6 +646,7 @@ while game_running:
                 get_room(player_coords, floor)
                 print("new coords: {}".format(player_coords))
                 look()
+                random_encounter_check()
             else:
                 print("Can't go that way.")
     
@@ -599,6 +712,8 @@ while game_running:
                 print("how much xp?")
             else:
                 XP += int(tag[1])
+        elif doing == "OP_fight":
+            random_encounter()
 
     while game_state == "level_up":
         congrats = False
@@ -608,7 +723,7 @@ while game_running:
             print("1. STR")
             print("2. CON")
             print("3. SPD")
-            
+
         XP -= 100 * LVL
         LVL += 1
         choice = input(" HP {}/{}:".format(HP,HP_max))
@@ -630,4 +745,44 @@ while game_running:
             print("New SPD: {}".format(SPD))
             game_state = "playing"
     
+    while game_state == "combat":
+        #generate enemies for player (do in random_encounter())
+        #lay out combat (e.g. player vs how many enemies of what kind)
+        #give the player numbered options
+        while len(enemies) > 0 and HP > 0:
+            print(enemies)
+            print("1. Attack")
+            print("2. Use Item")
+            print("3. Run Away")
+            choice = input(" HP {}/{}:".format(HP,HP_max))
+            if choice == "1":
+                for num in range(len(enemies)):
+                    print(str(num+1) + ".", enemies[num-1])
+                target = int(input("Which enemy?"))
+                for num in range(len(enemies)):
+                    if target-1 == num:
+                        player_attack(enemies[num])
+                        enemy_attack(enemies)
+        if HP > 0:
+            game_state = "playing"
+            look()
+        else:
+            game_state = "game_over"
+
+
+    while game_state == "game_over":
+        print("YOU HAVE DIED! GAME OVER")
+        print("1. Restart")
+        print("2. Quit")
+        choice = (input("What would you like to do?"))
+        if choice == "1":
+            game_restart()
+        elif choice == "2":
+            print("Goodbye!")
+            game_running == False
+            exit()
+        else:
+            print("Huh?")
+
+
     
