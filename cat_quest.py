@@ -5,12 +5,55 @@
 #class & function defs go here
 
 class Item:
-    def __init__(self, id, value, equippable = False):
+    def __init__(self, id, value,):
         self.id = id
         self.value = value
-        self.equippable = equippable
     def __repr__(self):
         return self.id
+    
+    def heal(self, amount):
+        global HP
+        global HP_max
+        HP += amount
+        if HP > HP_max:
+            HP = HP_max
+            print("Full health!")
+        else:
+            print ("Healed {} HP".format(amount))
+    
+    
+
+class Weapon(Item):
+    def __init__(self, id, value, bonus):
+        super().__init__(id, value)
+        self.bonus = bonus
+
+    def equip_weapon(self, weapon):
+        global equip
+        global ATK_bonus
+        if not equip["Weapon"] == None:
+            inventory.append(equip["Weapon"])
+        equip["Weapon"] = weapon
+        inventory.remove(weapon)
+        ATK_bonus = weapon.bonus
+        print("{} equipped! (+{})".format(weapon.id, weapon.bonus))
+
+class Armor(Item):
+    def __init__(self, id, value, bonus):
+        super().__init__(id, value)
+        self.bonus = bonus
+
+    def equip_armor(self, armor):
+        global equip
+        if not equip["Armor"] == None:
+            inventory.append(equip["Armor"])
+        equip["Armor"] = armor
+        inventory.remove(armor)
+        print("{} equipped! (+{})".format(armor.id, armor.bonus))
+
+class Accessory(Item):
+    def __init__(self, id, value):
+        super().__init__(id, value)
 
 class Room:
     def __init__(self, roomID, can_north, can_south, can_east, can_west, can_up=False, can_down=False, items=[], visited = False):
@@ -26,9 +69,9 @@ class Room:
     def __repr__(self, roomID):
         return self.roomID
 
-def get_room(coords, level):
+def get_room(coords, floor):
     global current_room
-    if level == 1:
+    if floor == 1:
         if coords == [3, 4]:
             current_room = bed
 
@@ -65,7 +108,7 @@ def get_room(coords, level):
         elif coords == [1, 0]:
             current_room = stairs1
 
-    elif level == 2:
+    elif floor == 2:
         if coords == [1,0]:
             current_room = stairs2
 
@@ -126,7 +169,7 @@ def get_room(coords, level):
         elif coords == [4, 5]:
             current_room = cactus2
 
-    elif level == 3:
+    elif floor == 3:
         if coords == [3,5]:
             current_room = stairs4
             
@@ -260,42 +303,41 @@ def get_item(id):
     if not id in str(current_room.items):
         print("There's no {} here.".format(id))
     else:
+        #items
         if id == "potion":
             inventory.append(potion)
             current_room.items.remove(potion)
+        #weapons
         elif id == "sword":
             inventory.append(sword)
             current_room.items.remove(sword)
+        #armors
+        elif id == "cat_armor":
+            inventory.append(cat_armor)
+            current_room.items.remove(cat_armor)
+        
         print("got {}!".format(id))
 
 def use_item(id):
     global inventory
-    global equip
-    global HP
-    global HP_max
     if not id in str(inventory):
         print("You don't have {}".format(id))
     else:
+        #items
         if id == "potion":
-            HP_max = HP
-            HP += 10
-            print("potion used")
-            if HP > HP_max:
-                HP = HP_max
-                print("Full health!")
-            else:
-                print("healed 10 HP")
+            potion.heal(10)
             inventory.remove(potion)
+
+        #weapons
         elif id == "sword":
-            if equip["Weapon"] == None:
-                equip["Weapon"] = sword
-                inventory.remove(sword)
-                print("sword equipped!")
-            else:
-                inventory.append(equip["Weapon"])
-                inventory.remove(sword)
-                equip["Weapon"] = sword
-                print("sword equipped!")
+            sword.equip_weapon(sword)
+            
+        elif id == "stick":
+            stick.equip_weapon(stick)
+        
+        #armors
+        elif id == "cat_armor":
+            cat_armor.equip_armor(cat_armor)
 
             
 
@@ -303,14 +345,18 @@ def use_item(id):
 
 #item objects go here
 potion = Item("potion", 50)
-sword = Item("sword", 100, )
-stick = Item("stick", 5)
+#weapons
+sword = Weapon("sword", 100, 5)
+stick = Weapon("stick", 5, 1)
+#armor
+cat_armor = Armor("cat_armor", 150, 5)
+#accessories
 
 # Room objects go here: (roomID, north, south, east, west, up, down, items)
-#level 1
+#floor 1
 bed = Room("bed", False, False, False, True, False, False, [potion])
 dungeon = Room("dungeon", True, True, True, False, False, False)
-bathroom = Room("bathroom", True, False, False, False, False, False)
+bathroom = Room("bathroom", True, False, False, False, items=[cat_armor])
 hallway1 = Room("hallway1", True, True, False, False, False, False)
 hallway2 = Room("hallway2", True, True, False, False, False, False)
 closet = Room("closet", False, False, True, True, False, False)
@@ -321,7 +367,7 @@ cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
 shop1 = Room("shop1", False, False, False, True, False, False)
 stairs1 = Room("stairs1", False, False, True, False, True, False)
 
-#level2
+#floor2
 stairs2 = Room("stairs2", False, True, True, False, False, True)
 maze1 = Room("maze1", False, True, True, True)
 maze3 = Room("maze3", False, True, False, True)
@@ -343,7 +389,7 @@ cactus_room1 = Room("cactus_room1", True, True, False, False)
 stairs3 = Room("stairs3", False, False, True, False, True, False)
 cactus2 = Room("cactus2", True, False, False, True)
 
-#level3
+#floor3
 stairs4 = Room("stairs4", True, False, False, False, False, True)
 owl_room2 = Room("owl_room2", True, True, True, False)
 trial1 = Room("trial1", True, False, False, False)
@@ -359,20 +405,27 @@ game_state = "playing"
 player_coords = [3, 4]
 HP = 10
 HP_max = 10
+ATK_bonus = 1
+ARM = 0
+STR = 3
+CON = 3
+SPD = 3
+LVL = 1
+XP = 0
 inventory = [potion]
 equip = {"Weapon": stick, "Armor": None, "Accessory": None}
-level = 1
+floor = 1
 current_room = None
-get_room(player_coords, level)
+get_room(player_coords, floor)
 look()
 # while loops go here
 while game_state == "playing":
-    doing = input("HP {}:".format(HP))
+    doing = input(" HP {}/{}:".format(HP,HP_max))
 
     if doing == "north" or doing == "n":
         if current_room.can_north == True:
             player_coords[1] -= 1
-            get_room(player_coords, level)
+            get_room(player_coords, floor)
             print("new coords: {}".format(player_coords))
             look()
         else:
@@ -381,7 +434,7 @@ while game_state == "playing":
     elif doing == "south" or doing == "s":
         if current_room.can_south == True:
             player_coords[1] += 1
-            get_room(player_coords, level)
+            get_room(player_coords, floor)
             print("new coords: {}".format(player_coords))
             look()
         else:
@@ -390,7 +443,7 @@ while game_state == "playing":
     elif doing == "west" or doing == "w":
         if current_room.can_west == True:
             player_coords[0] -= 1
-            get_room(player_coords, level)
+            get_room(player_coords, floor)
             print("new coords: {}".format(player_coords))
             look()
         else:
@@ -399,7 +452,7 @@ while game_state == "playing":
     elif doing == "east" or doing == "e":
         if current_room.can_east == True:
             player_coords[0] += 1
-            get_room(player_coords, level)
+            get_room(player_coords, floor)
             print("new coords: {}".format(player_coords))
             look()
         else:
@@ -407,8 +460,8 @@ while game_state == "playing":
     
     elif doing == "up" or doing == "u":
         if current_room.can_up == True:
-            level += 1
-            get_room(player_coords, level)
+            floor += 1
+            get_room(player_coords, floor)
             print("new coords: {}".format(player_coords))
             look()
         else:
@@ -416,8 +469,8 @@ while game_state == "playing":
     
     elif doing == "down" or doing == "d":
         if current_room.can_down == True:
-            level -= 1
-            get_room(player_coords, level)
+            floor -= 1
+            get_room(player_coords, floor)
             print("new coords: {}".format(player_coords))
             look()
         else:
@@ -425,8 +478,25 @@ while game_state == "playing":
 
     elif doing == "inventory" or doing == "inv":
         print(inventory)
-        print(equip)
+        if equip["Weapon"] == None:
+            wpn = "Weapon: None |"
+        else:
+            wpn = "Weapon: " + str(equip["Weapon"]) + " (+{})".format(equip["Weapon"].bonus) + " |"
+        if equip["Armor"] == None:
+            armr = " Armor: None |"
+        else:
+            armr = " Armor: " + str(equip["Armor"]) + " (+{})".format(equip["Armor"].bonus) + " |"
+        if equip["Accessory"] == None:
+            acc = " Accessory: None"
+        else:
+            acc = " Accessory: " + str(equip["Accessory"])
+
+        print(wpn + armr + acc)
     
+    elif doing == "character" or doing == "cha":
+        print("STR:", STR, "| CON:", CON, "| SPD:", SPD, "| ATK Bonus:", ATK_bonus, "| ARM:", ARM, "| LVL:", LVL, "| XP:", XP)
+
+
     elif doing == "look" or doing == "l":
         look()
 
