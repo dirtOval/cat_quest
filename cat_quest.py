@@ -5,7 +5,7 @@
 #class & function defs go here
 
 class Item:
-    def __init__(self, id, value, equippable=False):
+    def __init__(self, id, value, equippable = False):
         self.id = id
         self.value = value
         self.equippable = equippable
@@ -263,10 +263,14 @@ def get_item(id):
         if id == "potion":
             inventory.append(potion)
             current_room.items.remove(potion)
+        elif id == "sword":
+            inventory.append(sword)
+            current_room.items.remove(sword)
         print("got {}!".format(id))
 
 def use_item(id):
     global inventory
+    global equip
     global HP
     global HP_max
     if not id in str(inventory):
@@ -282,13 +286,25 @@ def use_item(id):
             else:
                 print("healed 10 HP")
             inventory.remove(potion)
+        elif id == "sword":
+            if equip["Weapon"] == None:
+                equip["Weapon"] = sword
+                inventory.remove(sword)
+                print("sword equipped!")
+            else:
+                inventory.append(equip["Weapon"])
+                inventory.remove(sword)
+                equip["Weapon"] = sword
+                print("sword equipped!")
+
             
 
 
 
-#items go here
+#item objects go here
 potion = Item("potion", 50)
-
+sword = Item("sword", 100, )
+stick = Item("stick", 5)
 
 # Room objects go here: (roomID, north, south, east, west, up, down, items)
 #level 1
@@ -300,7 +316,7 @@ hallway2 = Room("hallway2", True, True, False, False, False, False)
 closet = Room("closet", False, False, True, True, False, False)
 secret_chamber = Room("secret_chamber", False, False, True, False, False, False)
 hallway3 = Room("hallway3", True, True, True, False, False, False)
-armory = Room("armory", False, False, False, True, False, False)
+armory = Room("armory", False, False, False, True, False, False, [sword])
 cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
 shop1 = Room("shop1", False, False, False, True, False, False)
 stairs1 = Room("stairs1", False, False, True, False, True, False)
@@ -344,7 +360,7 @@ player_coords = [3, 4]
 HP = 10
 HP_max = 10
 inventory = [potion]
-equip = {"Weapon": None, "Armor": None, "Accessory": None}
+equip = {"Weapon": stick, "Armor": None, "Accessory": None}
 level = 1
 current_room = None
 get_room(player_coords, level)
@@ -409,6 +425,7 @@ while game_state == "playing":
 
     elif doing == "inventory" or doing == "inv":
         print(inventory)
+        print(equip)
     
     elif doing == "look" or doing == "l":
         look()
