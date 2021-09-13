@@ -30,12 +30,13 @@ class Weapon(Item):
 
     def equip_weapon(self, weapon):
         global equip
-        global ATK_bonus
+        global WPN_bonus
         if not equip["Weapon"] == None:
             inventory.append(equip["Weapon"])
         equip["Weapon"] = weapon
         inventory.remove(weapon)
-        ATK_bonus = weapon.bonus
+        WPN_bonus = weapon.bonus
+        update_attack()
         print("{} equipped! (+{})".format(weapon.id, weapon.bonus))
 
 class Armor(Item):
@@ -45,15 +46,61 @@ class Armor(Item):
 
     def equip_armor(self, armor):
         global equip
+        global ARM
         if not equip["Armor"] == None:
             inventory.append(equip["Armor"])
         equip["Armor"] = armor
         inventory.remove(armor)
+        ARM = armor.bonus
         print("{} equipped! (+{})".format(armor.id, armor.bonus))
 
 class Accessory(Item):
-    def __init__(self, id, value):
+    def __init__(self, id, value, bonus):
         super().__init__(id, value)
+        self.bonus = bonus
+
+    def effect(self):
+        global HP_max
+        global ATK_effect
+        global ARM
+        global STR
+        global CON
+        global SPD
+
+        if self.bonus == "HP_boost":
+            HP_max += 5
+
+        if self.bonus == "ATK_up":
+            ATK_effect = 3
+            update_attack()
+
+    def uneffect(self):
+        global HP
+        global HP_max
+        global ATK_effect
+        global ARM
+        global STR
+        global CON
+        global SPD
+
+        if self.bonus == "HP_boost":
+            HP_max -= 5
+            if HP > HP_max:
+                HP = HP_max
+
+        if self.bonus == "ATK_up":
+            ATK_effect = 0
+            update_attack()
+
+    def equip_accessory(self, acc):
+        global equip
+        if not equip["Accessory"] == None:
+            inventory.append(equip["Accessory"])
+            equip["Accessory"].uneffect()
+        equip["Accessory"] = acc
+        inventory.remove(acc)
+        acc.effect()
+        print("{} equipped! (+{})".format(acc.id, acc.bonus))
 
 class Room:
     def __init__(self, roomID, can_north, can_south, can_east, can_west, can_up=False, can_down=False, items=[], visited = False):
@@ -315,6 +362,13 @@ def get_item(id):
         elif id == "cat_armor":
             inventory.append(cat_armor)
             current_room.items.remove(cat_armor)
+        #accessories
+        elif id == "tough_collar":
+            inventory.append(tough_collar)
+            current_room.items.remove(tough_collar)
+        elif id == "cute_collar":
+            inventory.append(cute_collar)
+            current_room.items.remove(cute_collar)
         
         print("got {}!".format(id))
 
@@ -338,9 +392,19 @@ def use_item(id):
         #armors
         elif id == "cat_armor":
             cat_armor.equip_armor(cat_armor)
-
+        
+        #accessories
+        elif id == "tough_collar":
+            tough_collar.equip_accessory(tough_collar)
+        elif id == "cute_collar":
+            cute_collar.equip_accessory(cute_collar)
             
-
+def update_attack():
+    global ATK_bonus
+    global WPN_bonus
+    global ATK_effect
+    ATK_bonus = WPN_bonus + ATK_effect
+    print("WPN {} + BONUS {} = ATK Bonus: {}".format(WPN_bonus, ATK_effect, ATK_bonus))
 
 
 #item objects go here
@@ -351,20 +415,21 @@ stick = Weapon("stick", 5, 1)
 #armor
 cat_armor = Armor("cat_armor", 150, 5)
 #accessories
-
+tough_collar = Accessory("tough_collar", 200, "HP_boost")
+cute_collar = Accessory("cute_collar", 200, "ATK_up")
 # Room objects go here: (roomID, north, south, east, west, up, down, items)
 #floor 1
 bed = Room("bed", False, False, False, True, False, False, [potion])
 dungeon = Room("dungeon", True, True, True, False, False, False)
 bathroom = Room("bathroom", True, False, False, False, items=[cat_armor])
 hallway1 = Room("hallway1", True, True, False, False, False, False)
-hallway2 = Room("hallway2", True, True, False, False, False, False)
+hallway2 = Room("hallway2", True, True, False, True, False, False)
 closet = Room("closet", False, False, True, True, False, False)
-secret_chamber = Room("secret_chamber", False, False, True, False, False, False)
+secret_chamber = Room("secret_chamber", False, False, True, False, items=[tough_collar])
 hallway3 = Room("hallway3", True, True, True, False, False, False)
 armory = Room("armory", False, False, False, True, False, False, [sword])
 cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
-shop1 = Room("shop1", False, False, False, True, False, False)
+shop1 = Room("shop1", False, False, False, True, items=[cute_collar])
 stairs1 = Room("stairs1", False, False, True, False, True, False)
 
 #floor2
@@ -405,7 +470,9 @@ game_state = "playing"
 player_coords = [3, 4]
 HP = 10
 HP_max = 10
-ATK_bonus = 1
+WPN_bonus = 1
+ATK_effect = 0
+ATK_bonus = WPN_bonus + ATK_effect
 ARM = 0
 STR = 3
 CON = 3
@@ -489,7 +556,7 @@ while game_state == "playing":
         if equip["Accessory"] == None:
             acc = " Accessory: None"
         else:
-            acc = " Accessory: " + str(equip["Accessory"])
+            acc = " Accessory: " + str(equip["Accessory"]) + " (+{})".format(equip["Accessory"].bonus)
 
         print(wpn + armr + acc)
     
