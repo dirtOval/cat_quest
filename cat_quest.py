@@ -103,7 +103,7 @@ class Accessory(Item):
         print("{} equipped! (+{})".format(acc.id, acc.bonus))
 
 class Room:
-    def __init__(self, roomID, can_north, can_south, can_east, can_west, can_up=False, can_down=False, items=[], visited = False):
+    def __init__(self, roomID, can_north, can_south, can_east, can_west, can_up=False, can_down=False, items=[], visited = False, shop=None):
         self.roomID = roomID
         self.items = items
         self.can_north = can_north
@@ -113,19 +113,26 @@ class Room:
         self.can_up = can_up
         self.can_down = can_down
         self.visited = visited
+        self.shop = shop
     def __repr__(self, roomID):
         return self.roomID
 
 class Mob:
-    def __init__(self, ID, HP, STR, CON, SPD, XP):
+    def __init__(self, ID, HP, STR, CON, SPD, XP, money):
         self.ID = ID
         self.HP = HP
         self.STR = STR
         self.CON = CON
         self.SPD = SPD
         self.XP = XP
+        self.money = money
     def __repr__(self):
         return self.ID
+
+class Shop:
+    def __init__(self, ID, items):
+        self.ID = ID
+        self.items = items
 
 #Functions
 def get_room(coords, floor):
@@ -252,6 +259,8 @@ def get_room(coords, floor):
             
         elif coords == [4,4]:
             current_room = shop3
+    if not current_room.visited:
+        current_room.visited = True
 
 def look():
     global roomID
@@ -425,7 +434,7 @@ def update_HP_total():
 def random_encounter_check():
     global game_state
     chance = random.randint(1, 100)
-    if chance >= 70:
+    if chance >= 85:
         print("RANDOM ENCOUNTER! TIME TO FIGHT!")
         random_encounter()
 
@@ -440,12 +449,27 @@ def random_encounter():
             enemies.append(num)
         game_state = "combat"
         print("{} ghost dogs appear, teeth bared!".format(amount))
+    elif floor == 2:
+        amount = random.randint(1, 3)
+        for num in range(1, amount+1):
+            num = copy.copy(mean_bird)
+            enemies.append(num)
+        game_state = "combat"
+        print("{} mean birds fly down, ready to fight!".format(amount))
+    elif floor == 3:
+        amount = random.randint(1, 4)
+        for num in range(1, amount+1):
+            num = copy.copy(mega_rat)
+            enemies.append(num)
+        game_state = "combat"
+        print("{} mega rats scurry over, ready to throw down!".format(amount))
 
 def player_attack(target):
     global ATK_bonus
     global WPN_bonus
     global STR
     global XP
+    global GP
     roll = random.randint(1, 20) + ATK_bonus
     if roll >= 10 + target.SPD:
         damage = WPN_bonus + STR
@@ -453,8 +477,9 @@ def player_attack(target):
         print("Did {} damage to {} ({} left)".format(damage, target, target.HP))
         if target.HP <= 0:
             print("{} died!".format(target))
-            print("Gained {} XP".format(target.XP))
+            print("Gained {} XP, {} GP".format(target.XP, target.money))
             XP += target.XP
+            GP += target.money
             enemies.remove(target)
     else:
         print("You missed!")
@@ -497,6 +522,7 @@ def game_restart():
     global inventory
     global equip
     global current_room
+    global player_coords
     game_state = "playing"
     enemies = []
     player_coords = [3, 4]
@@ -520,7 +546,10 @@ def game_restart():
     look()
 
 #enemy objects go here
-ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25)
+ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25)
+mean_bird = Mob("mean_bird", 8, 5, 5, 5, 50, 50)
+mega_rat = Mob("mega_rat", 12, 8, 8, 8, 125, 125)
+
 
 #item objects go here
 potion = Item("potion", 50)
@@ -533,6 +562,10 @@ cat_armor = Armor("cat_armor", 150, 2)
 tough_collar = Accessory("tough_collar", 200, "HP_boost")
 cute_collar = Accessory("cute_collar", 200, "ATK_up")
 # Room objects go here: (roomID, north, south, east, west, up, down, items)
+
+#shop objects go here
+shop1 = Shop("shop1", [potion])
+
 #floor 1
 bed = Room("bed", False, False, False, True, False, False, [potion])
 dungeon = Room("dungeon", True, True, True, False, False, False)
@@ -544,7 +577,7 @@ secret_chamber = Room("secret_chamber", False, False, True, False, items=[tough_
 hallway3 = Room("hallway3", True, True, True, False, False, False)
 armory = Room("armory", False, False, False, True, False, False, [sword])
 cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
-shop1 = Room("shop1", False, False, False, True, items=[cute_collar])
+shop1 = Room("shop1", False, False, False, True, items=[cute_collar], shop=shop1)
 stairs1 = Room("stairs1", False, False, True, False, True, False)
 
 #floor2
@@ -593,6 +626,7 @@ CON = 3
 SPD = 3
 LVL = 1
 XP = 0
+GP = 0
 update_attack()
 update_HP_total()
 HP = HP_max
@@ -687,7 +721,7 @@ while game_running:
             else:
                 acc = " Accessory: " + str(equip["Accessory"]) + " (+{})".format(equip["Accessory"].bonus)
 
-            print(wpn + armr + acc)
+            print(wpn + armr + acc + " | GP: " + str(GP))
     
         elif doing == "character" or doing == "cha":
             print("STR:", STR, "| CON:", CON, "| SPD:", SPD, "| ATK Bonus:", ATK_bonus, "| ARM:", ARM, "| LVL:", LVL, "| XP:", XP)
@@ -695,6 +729,12 @@ while game_running:
 
         elif doing == "look" or doing == "l":
             look()
+
+        elif doing == "shop":
+            if not current_room.shop == None:
+                game_state = "shop"
+            else:
+                print("There's no store here!")
 
         elif "get" in doing:
             tag = doing.split()
@@ -709,6 +749,7 @@ while game_running:
                 print("Use what?")
             else:
                 use_item(tag[1])
+                
         #TEST COMMANDS: REMOVE THESE LATER!!
         elif "OP_giveXP" in doing:
             tag = doing.split()
@@ -718,6 +759,7 @@ while game_running:
                 XP += int(tag[1])
         elif doing == "OP_fight":
             random_encounter()
+
 
     while game_state == "level_up":
         congrats = False
@@ -811,5 +853,24 @@ while game_running:
         else:
             print("Huh?")
 
-
-    
+    while game_state == "shop":
+        print("Here are the available items: (type 'done' when finished shopping!)")
+        for num in range(len(current_room.shop.items)):
+            print(str(num+1) + "." + current_room.shop.items[num-1].id + ":" + str(current_room.shop.items[num-1].value))
+        choice = (input("Current GP: {}: ".format(GP)))
+        if choice == "done":
+            print("bye bye!")
+            game_state = "playing"
+            look()
+            break
+        for num in range(len(current_room.shop.items)):
+            if choice == str(num+1):
+                if GP > current_room.shop.items[num-1].value:
+                    GP -= current_room.shop.items[num-1].value
+                    inventory.append(current_room.shop.items[num-1])
+                    print("Bought {}".format(current_room.shop.items[num-1].id))
+                else:
+                        print("Not enough money!")
+            else:
+                print("Invalid selection")
+        
