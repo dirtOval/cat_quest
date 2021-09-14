@@ -137,6 +137,7 @@ class Shop:
 #Functions
 def get_room(coords, floor):
     global current_room
+    global game_state
     if floor == 1:
         if coords == [3, 4]:
             current_room = bed
@@ -253,9 +254,10 @@ def get_room(coords, floor):
 
         elif coords == [3,0]:
             current_room = boss
-            
+            boss_battle()
         elif coords == [3,-1]:
             current_room = food
+            you_win()
             
         elif coords == [4,4]:
             current_room = shop3
@@ -322,7 +324,7 @@ def look():
         print("There's a shop here. Why is there a shop in the LABYRINTH OF MISERY?")
     elif current_room.roomID == "cat_tree2":
         print("There's another cat tree here. Looks comfy, if a little damp.")
-    elif current_room.roomID == "key_room":
+    elif current_room.roomID == "key_room1":
         print("There's a big chest here.")
     elif current_room.roomID == "cactus_room1":
         print("This room is full of cacti. They look dangerous.")
@@ -379,10 +381,19 @@ def get_item(id):
         elif id == "sword":
             inventory.append(sword)
             current_room.items.remove(sword)
+        elif id == "mega_sword":
+            inventory.append(mega_sword)
+            current_room.items.remove(mega_sword)
         #armors
         elif id == "cat_armor":
             inventory.append(cat_armor)
             current_room.items.remove(cat_armor)
+        elif id == "super_armor":
+            inventory.append(super_armor)
+            current_room.items.remove(super_armor)
+        elif id == "mega_armor":
+            inventory.append(mega_armor)
+            current_room.items.remove(mega_armor)
         #accessories
         elif id == "tough_collar":
             inventory.append(tough_collar)
@@ -410,9 +421,16 @@ def use_item(id):
         elif id == "stick":
             stick.equip_weapon(stick)
         
+        elif id == "mega_sword":
+            mega_sword.equip_weapon(mega_sword)
+        
         #armors
         elif id == "cat_armor":
             cat_armor.equip_armor(cat_armor)
+        elif id == "super_armor":
+            super_armor.equip_armor(super_armor)
+        elif id == "mega_armor":
+            mega_armor.equip_armor(mega_armor)
         
         #accessories
         elif id == "tough_collar":
@@ -434,7 +452,7 @@ def update_HP_total():
 def random_encounter_check():
     global game_state
     chance = random.randint(1, 100)
-    if chance >= 85:
+    if chance >= 70:
         print("RANDOM ENCOUNTER! TIME TO FIGHT!")
         random_encounter()
 
@@ -505,6 +523,15 @@ def death_check():
     if HP <= 0:
         game_state = "game_over"
 
+def boss_battle():
+    global enemies
+    global game_state
+    enemies=[human]
+    print("The final enemy emerges. . . .")
+    print("TIME FOR BOSS BATTLE")
+    game_state = "combat"
+
+
 def game_restart():
     global game_state
     global enemies
@@ -545,27 +572,36 @@ def game_restart():
     get_room(player_coords, floor)
     look()
 
+def you_win():
+    global game_state
+    game_state = "victory"
+
 #enemy objects go here
 ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25)
 mean_bird = Mob("mean_bird", 8, 5, 5, 5, 50, 50)
 mega_rat = Mob("mega_rat", 12, 8, 8, 8, 125, 125)
+human = Mob("human", 30, 10, 10, 10, 500, 1000)
 
 
 #item objects go here
 potion = Item("potion", 50)
 #weapons
+mega_sword = Weapon("mega_sword", 200, 10)
 sword = Weapon("sword", 100, 5)
 stick = Weapon("stick", 5, 1)
 #armor
-cat_armor = Armor("cat_armor", 150, 2)
+cat_armor = Armor("cat_armor", 100, 2)
+super_armor = Armor("super_armor", 150, 4)
+mega_armor = Armor("mega_armor", 200, 6)
 #accessories
-tough_collar = Accessory("tough_collar", 200, "HP_boost")
-cute_collar = Accessory("cute_collar", 200, "ATK_up")
+tough_collar = Accessory("tough_collar", 100, "HP_boost")
+cute_collar = Accessory("cute_collar", 100, "ATK_up")
 # Room objects go here: (roomID, north, south, east, west, up, down, items)
 
 #shop objects go here
-shop1 = Shop("shop1", [potion])
-
+shop1 = Shop("shop1", [potion, cute_collar])
+shop2 = Shop("shop2", [potion, super_armor])
+shop3 = Shop("shop3", [potion, mega_armor, mega_sword])
 #floor 1
 bed = Room("bed", False, False, False, True, False, False, [potion])
 dungeon = Room("dungeon", True, True, True, False, False, False)
@@ -577,7 +613,7 @@ secret_chamber = Room("secret_chamber", False, False, True, False, items=[tough_
 hallway3 = Room("hallway3", True, True, True, False, False, False)
 armory = Room("armory", False, False, False, True, False, False, [sword])
 cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
-shop1 = Room("shop1", False, False, False, True, items=[cute_collar], shop=shop1)
+shop1 = Room("shop1", False, False, False, True, shop=shop1)
 stairs1 = Room("stairs1", False, False, True, False, True, False)
 
 #floor2
@@ -595,7 +631,7 @@ maze7 = Room("maze7", True, True, False, True)
 maze8 = Room("maze8", True, True, False, False)
 maze9 = Room("maze9", True, True, False, False)
 maze = Room("maze", True, True, False, False)
-shop2 = Room("shop2", False, False, True, False)
+shop2 = Room("shop2", False, False, True, False, shop=shop2)
 cat_tree2 = Room("cat_tree2", True, False, True, True)
 key_room1 = Room("key_room1", True, False, False, True)
 cactus_room1 = Room("cactus_room1", True, True, False, False)
@@ -610,7 +646,7 @@ trial2 = Room("trial2", True, False, False, False)
 trial3 = Room("trial3", True, False, False, False)
 boss = Room("boss", True, False, False, False)
 food = Room("food", False, False, False, False)
-shop3 = Room("shop3", False, False, False, True)
+shop3 = Room("shop3", False, False, False, True, shop=shop3)
 
 
 #start up scripts go here, e.g. title graphic, game_state = "new_game"
@@ -853,6 +889,20 @@ while game_running:
         else:
             print("Huh?")
 
+    while game_state == "victory":
+        print("YOU WIN!!! TIME FOR DINNER!!")
+        print("1. Restart")
+        print("2. Quit")
+        choice = (input("What would you like to do?"))
+        if choice == "1":
+            game_restart()
+        elif choice == "2":
+            print("Goodbye!")
+            game_running == False
+            exit()
+        else:
+            print("Huh?")
+
     while game_state == "shop":
         print("Here are the available items: (type 'done' when finished shopping!)")
         for num in range(len(current_room.shop.items)):
@@ -865,12 +915,9 @@ while game_running:
             break
         for num in range(len(current_room.shop.items)):
             if choice == str(num+1):
-                if GP > current_room.shop.items[num-1].value:
+                if GP >= current_room.shop.items[num-1].value:
                     GP -= current_room.shop.items[num-1].value
                     inventory.append(current_room.shop.items[num-1])
                     print("Bought {}".format(current_room.shop.items[num-1].id))
                 else:
                         print("Not enough money!")
-            else:
-                print("Invalid selection")
-        
