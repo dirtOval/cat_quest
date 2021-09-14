@@ -283,6 +283,7 @@ def look():
     global room_item
     if current_room.roomID == "bed":
         print("It's your bedroom. Cat bed, water dish, toy mouse.")
+        print("(type 'help' if you don't know what to do!)")
     elif current_room.roomID == "dungeon":
         print("It's the dungeon outside your bedroom.")
     elif current_room.roomID == "bathroom":
@@ -339,7 +340,7 @@ def look():
     elif current_room.roomID == "cat_tree2":
         print("There's another cat tree here. Looks comfy, if a little damp.")
     elif current_room.roomID == "key_room1":
-        print("There's a big chest here.")
+        print("There's a big wooden sign that says 'MAP' here.")
     elif current_room.roomID == "cactus_room1":
         print("This room is full of cacti. They look dangerous.")
     elif current_room.roomID == "cactus2":
@@ -810,6 +811,22 @@ while game_running:
                 print("Use what?")
             else:
                 use_item(tag[1])
+
+        elif doing == "help":
+            print("USEFUL COMMANDS:")
+            print("north (n) - go north 1 room")
+            print("south (s) - go south 1 room")
+            print("east (e) - go east 1 room")
+            print("west (w) - go west 1 room")
+            print("up (u) - go up one floor")
+            print("down (d) - go down one floor")
+            print("get <object> - picks up selected item")
+            print("use <object> - uses or equips selected object in inventory")
+            print("inventory (inv) - display inventory")
+            print("character (cha) - displays character sheet")
+            print("nap - naps to restore health to full in cat tree rooms")
+            print("shop - opens shopping menu in rooms with shops")
+
                 
         #TEST COMMANDS: REMOVE THESE LATER!!
         elif "OP_giveXP" in doing:
@@ -1061,6 +1078,7 @@ while game_running:
                 print("THE VOID: now you must suffer!")
                 print("THE VOID: farewell, foolish mortal! bwahahahahahahahahahahaha")
                 game_state = "playing"
+                look()
                 break
             elif choice1 == "2":
                 print("THE VOID: what?! impossible! nooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
@@ -1069,6 +1087,7 @@ while game_running:
                 choice2 = input("->")
                 if choice2 == "1":
                     game_state = "playing"
+                    look() 
                     break
 
         elif current_room == boss:
