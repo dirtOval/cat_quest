@@ -138,6 +138,7 @@ class Shop:
 def get_room(coords, floor):
     global current_room
     global game_state
+    global enemies
     if floor == 1:
         if coords == [3, 4]:
             current_room = bed
@@ -159,6 +160,8 @@ def get_room(coords, floor):
             
         elif coords == [0, 2]:
             current_room = secret_chamber
+            if current_room.visited == False:
+                game_state = "dialogue"
             
         elif coords == [2, 1]:
             current_room = hallway3
@@ -190,6 +193,8 @@ def get_room(coords, floor):
             
         elif coords == [2,1]:
             current_room = owl_room1
+            if current_room.visited == False:
+                game_state = "dialogue"
             
         elif coords == [3,1]:
             current_room = maze4
@@ -242,19 +247,28 @@ def get_room(coords, floor):
             
         elif coords == [3,4]:
             current_room = owl_room2
+            if current_room.visited == False:
+                game_state = "dialogue"
             
         elif coords == [3,3]:
             current_room = trial1
+            if current_room.visited == False:
+                game_state = "dialogue"
             
         elif coords == [3,2]:
             current_room = trial2
+            if current_room.visited == False:
+                rat_fight()
             
         elif coords == [3,1]:
             current_room = trial3
+            if current_room.visited == False:
+                game_state = "dialogue"
 
         elif coords == [3,0]:
             current_room = boss
             boss_battle()
+
         elif coords == [3,-1]:
             current_room = food
             you_win()
@@ -280,7 +294,7 @@ def look():
     elif current_room.roomID == "closet":
         print("It's a closet. It's just full of cleaning supplies but something about it seems fishy.")
     elif current_room.roomID == "secret_chamber":
-        print("Of course there was a secret chamber behind the closet.")
+        print("Of course there was a secret chamber behind the closet. There's a frog here.")
     elif current_room.roomID == "hallway3":
         print("The north end of the long hallway in CAT CASTLE. There's a big spooky cat banner on the wall.")
     elif current_room.roomID == "armory":
@@ -344,9 +358,9 @@ def look():
     elif current_room.roomID == "trial2":
         print("There's a bunch of bones lying around.")
     elif current_room.roomID == "trial3":
-        print("There's some other kind of trial here (lol)")
+        print("It's very dark here")
     elif current_room.roomID == "boss":
-        print("There's a human here ready to do battle.")
+        print("The Lair of The Human.")
     elif current_room.roomID == "food":
         print("It's your dinner! You win!")
     #say what items are here
@@ -452,7 +466,7 @@ def update_HP_total():
 def random_encounter_check():
     global game_state
     chance = random.randint(1, 100)
-    if chance >= 70:
+    if chance >= 80:
         print("RANDOM ENCOUNTER! TIME TO FIGHT!")
         random_encounter()
 
@@ -475,12 +489,13 @@ def random_encounter():
         game_state = "combat"
         print("{} mean birds fly down, ready to fight!".format(amount))
     elif floor == 3:
-        amount = random.randint(1, 4)
-        for num in range(1, amount+1):
-            num = copy.copy(mega_rat)
-            enemies.append(num)
-        game_state = "combat"
-        print("{} mega rats scurry over, ready to throw down!".format(amount))
+        pass
+        #amount = random.randint(1, 4)
+        #for num in range(1, amount+1):
+            #num = copy.copy(mega_rat)
+            #enemies.append(num)
+        #game_state = "combat"
+        #print("{} mega rats scurry over, ready to throw down!".format(amount))
 
 def player_attack(target):
     global ATK_bonus
@@ -529,6 +544,15 @@ def boss_battle():
     enemies=[human]
     print("The final enemy emerges. . . .")
     print("TIME FOR BOSS BATTLE")
+    game_state = "dialogue"
+
+def rat_fight():
+    global enemies
+    global game_state
+    for num in range(4):
+            num = copy.copy(mega_rat)
+            enemies.append(num)
+    print("Four mega rats scurry out of the darkness! time to fight!")
     game_state = "combat"
 
 
@@ -580,7 +604,8 @@ def you_win():
 ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25)
 mean_bird = Mob("mean_bird", 8, 5, 5, 5, 50, 50)
 mega_rat = Mob("mega_rat", 12, 8, 8, 8, 125, 125)
-human = Mob("human", 30, 10, 10, 10, 500, 1000)
+human = Mob("human", 50, 14, 10, 10, 500, 1000)
+sphinx = Mob("sphinx", 100, 30, 30, 30, 1000, 1000)
 
 
 #item objects go here
@@ -609,7 +634,7 @@ bathroom = Room("bathroom", True, False, False, False, items=[cat_armor])
 hallway1 = Room("hallway1", True, True, False, False, False, False)
 hallway2 = Room("hallway2", True, True, False, True, False, False)
 closet = Room("closet", False, False, True, True, False, False)
-secret_chamber = Room("secret_chamber", False, False, True, False, items=[tough_collar])
+secret_chamber = Room("secret_chamber", False, False, True, False)
 hallway3 = Room("hallway3", True, True, True, False, False, False)
 armory = Room("armory", False, False, False, True, False, False, [sword])
 cat_tree1 = Room("cat_tree1", False, True, True, True, False, False)
@@ -688,7 +713,6 @@ while game_running:
             if current_room.can_north == True:
                 player_coords[1] -= 1
                 get_room(player_coords, floor)
-                print("new coords: {}".format(player_coords))
                 look()
                 random_encounter_check()
             else:
@@ -698,7 +722,6 @@ while game_running:
             if current_room.can_south == True:
                 player_coords[1] += 1
                 get_room(player_coords, floor)
-                print("new coords: {}".format(player_coords))
                 look()
                 random_encounter_check()
             else:
@@ -708,7 +731,6 @@ while game_running:
             if current_room.can_west == True:
                 player_coords[0] -= 1
                 get_room(player_coords, floor)
-                print("new coords: {}".format(player_coords))
                 look()
                 random_encounter_check()
             else:
@@ -718,7 +740,6 @@ while game_running:
             if current_room.can_east == True:
                 player_coords[0] += 1
                 get_room(player_coords, floor)
-                print("new coords: {}".format(player_coords))
                 look()
                 random_encounter_check()
             else:
@@ -728,7 +749,6 @@ while game_running:
             if current_room.can_up == True:
                 floor += 1
                 get_room(player_coords, floor)
-                print("new coords: {}".format(player_coords))
                 look()
             else:
                 print("Can't go that way.")
@@ -737,7 +757,6 @@ while game_running:
             if current_room.can_down == True:
                 floor -= 1
                 get_room(player_coords, floor)
-                print("new coords: {}".format(player_coords))
                 look()
             else:
                 print("Can't go that way.")
@@ -771,6 +790,12 @@ while game_running:
                 game_state = "shop"
             else:
                 print("There's no store here!")
+
+        elif doing == "nap":
+            if "cat_tree" in current_room.roomID:
+                print("Nap Time!")
+                print("HP restored to full!")
+                HP = HP_max
 
         elif "get" in doing:
             tag = doing.split()
@@ -921,3 +946,141 @@ while game_running:
                     print("Bought {}".format(current_room.shop.items[num-1].id))
                 else:
                         print("Not enough money!")
+
+    while game_state == "dialogue":
+        if current_room == secret_chamber:
+            print("FROG: oh hello. welcome to my secret grotto")
+            print("1. Hi")
+            choice1 = input("->")
+            if choice1 == "1":
+                print("FROG: do you like my secret grotto")
+                print("1. Yes")
+                print("2. No")
+                choice2 = input("->")
+                if choice2 == "1":
+                    print("FROG: of course you do! it is a most delightful grotto.")
+                    print("FROG: here, i have a present for you")
+                    print("received tough_collar")
+                    inventory.append(tough_collar)
+                    print("1. Thanks")
+                    choice3 = input("->")
+                    if choice3 == "1":
+                        game_state = "playing"
+                        look()
+                        break
+                elif choice2 == "2":
+                    print("FROG: well, you must have terrible taste in grottos!")
+                    print("FROG: begone! i want to be alone right now.")
+                    print("1. Ok")
+                    choice3 = input("->")
+                    if choice3 == "1":
+                        game_state = "playing"
+                        look()
+                        break
+        elif current_room == owl_room1:
+            print("OWL: helloooo brave adventurer cat! i bid thee welcome to the labyrinth of misery!")
+            print("OWL: i pray thou art stronger than thine appearance might indicate!")
+            print("OWL: for this labyrinth is full of really mean birds! they'll peck you!")
+            print("1. Ok")
+            choice1 = input("->")
+            if choice1 == "1":
+                print("OWL: i worry that thou dost not heed my warning!")
+                print("OWL: seriously, the birds here will mess thou up if thou aren't properly equipped")
+                print("OWL: taketh thyself three rooms down and one to the left for the item shop!")
+                print("1. Thanks")
+                choice2 = input("->")
+                if choice2 == "1":
+                    print("OWL: Dost thou not want me to repeat everything I just said again?")
+                    print("1. No")
+                    print("2. Yes")
+                    choice3 = input("->")
+                    if choice3 == "1":
+                        print("OWL: i understand! thou don't not want me to repeat everything i just said!")
+                        print("OWL: listen carefully!")
+                        continue
+                    elif choice3 == "2":
+                        print("OWL: very well! i bid thee good luck, fair cat!")
+                        game_state = "playing"
+                        look()
+                        break
+        elif current_room == owl_room2:
+            if owl_room1.visited == True:
+                print("OWL: helloooo again brave adventurer cat! i did not expect to see thee so soon!")
+            else:
+                print("OWL: helloooo brave adventure cat!")
+            print("OWL: thou hast grown so powerful in so short a time. but now thou must face thy greatest challenge yet!")
+            print("OWL: here in the HELL KITCHEN three trials await thee!")
+            print("OWL: a riddling sphinx, a squad of dreadful mega rats, and a being too terrible to name!")
+            print("1. Ok")
+            choice1 = input("->")
+            if choice1 == "1":
+                print("OWL: head east to the shop before venturing north!")
+                print("OWL: for once the trials have commenced they cannot be stopped!")
+                print("OWL: prepare wisely, lest thou meet thy dooooom!")
+                print("1. Ok")
+                choice2 = input("->")
+                if choice2 == "1":
+                    print("OWL: dost thou want me to repeat everything i just said?")
+                    print("1. Yes")
+                    print("2. No")
+                    choice3 = input("->")
+                    if choice3 == "1":
+                        print("OWL: very well! i shall repeat myself!")
+                        print("OWL: listen better this time!")
+                        continue
+                    elif choice3 == "2":
+                        print("OWL: very well! good luck, brave cat! may you find your dinner at last!")
+                        game_state = "playing"
+                        look()
+                        break
+        elif current_room == trial1:
+            print("SPHINX: welcome foolish adventurer! if you want to pass you must solve my riddle! get it wrong and i'll eat you!")
+            print("SPHINX: What has a ring but no fingers!")
+            print("SPHINX: single word responses only, please ;)")
+            choice = input("->")
+            if choice == "phone" or choice == "telephone":
+                print("SPHINX: damn, you got it right! good job! i guess i'll let you live")
+                print("SPHINX: you may pass!")
+                game_state = "playing"
+                look()
+                break
+            else:
+                print("SPHINX: you got it wrong! now you must die!")
+                enemies = [sphinx]
+                game_state = "combat"
+                break
+
+        elif current_room == trial3:
+            print("THE VOID: so at last you have come to the final trial!")
+            print("THE VOID: i bet you didn't expect the trial to be . . . . loneliness")
+            print("1. I didn't")
+            print("2. Actually I did")
+            choice1 = input("->")
+            if choice1 == "1":
+                print("THE VOID: that's what i thought! muahahahahahaha!")
+                print("THE VOID: now you must suffer!")
+                print("THE VOID: farewell, foolish mortal! bwahahahahahahahahahahaha")
+                game_state = "playing"
+                break
+            elif choice1 == "2":
+                print("THE VOID: what?! impossible! nooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+                print("THE VOID: oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+                print("1. Nice")
+                choice2 = input("->")
+                if choice2 == "1":
+                    game_state = "playing"
+                    break
+
+        elif current_room == boss:
+            print("HUMAN: silly kitty! you know it's not time for dinner yet!")
+            print("1. Meow")
+            choice1 = input("->")
+            if choice1 == "1":
+                print("HUMAN: no no no, it is not time for dinner yet")
+                print("1. Meowwww")
+                choice2 = input("->")
+                if choice2 == "1":
+                    print("HUMAN: i see. . . i understand now that we have no choice but to do battle.")
+                    print("HUMAN: have at thee, feline!")
+                    game_state = "combat"
+                    break
