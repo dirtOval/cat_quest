@@ -1,6 +1,6 @@
 #libraries go here
 import random
-
+import copy
 
 #classes
 
@@ -436,9 +436,10 @@ def random_encounter():
     if floor == 1:
         amount = random.randint(1, 3)
         for num in range(1, amount+1):
-            enemies.append(dog)
+            num = copy.copy(ghost_dog)
+            enemies.append(num)
         game_state = "combat"
-        print("{} dogs appear, teeth bared!".format(amount))
+        print("{} ghost dogs appear, teeth bared!".format(amount))
 
 def player_attack(target):
     global ATK_bonus
@@ -461,10 +462,13 @@ def player_attack(target):
 def enemy_attack(attacker):
     global HP
     global SPD
+    global ARM
     for enemy in enemies:
         roll = random.randint(1,20) + enemy.STR
         if roll >= 10 + SPD:
-            damage = STR
+            damage = STR - ARM
+            if damage < 0:
+                damage = 0
             print("{} did {} damage to you!".format(enemy, damage))
             HP -= damage
             death_check()
@@ -516,7 +520,7 @@ def game_restart():
     look()
 
 #enemy objects go here
-dog = Mob("dog", 5, 3, 3, 3, 25)
+ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25)
 
 #item objects go here
 potion = Item("potion", 50)
@@ -524,7 +528,7 @@ potion = Item("potion", 50)
 sword = Weapon("sword", 100, 5)
 stick = Weapon("stick", 5, 1)
 #armor
-cat_armor = Armor("cat_armor", 150, 5)
+cat_armor = Armor("cat_armor", 150, 2)
 #accessories
 tough_collar = Accessory("tough_collar", 200, "HP_boost")
 cute_collar = Accessory("cute_collar", 200, "ATK_up")
@@ -763,6 +767,29 @@ while game_running:
                     if target-1 == num:
                         player_attack(enemies[num])
                         enemy_attack(enemies)
+
+            elif choice == "2":
+                if len(inventory) > 0:
+                    for num in range(len(inventory)):
+                        print(str(num+1) + ".", inventory[num-1])
+                    choice = int(input("Use which item?"))
+                    for num in range(len(inventory)):
+                        if choice-1 == num:
+                            use_item(inventory[num-1].id)
+                    enemy_attack(enemies)
+                else:
+                     print("You have no items!")
+
+            elif choice == "3":
+                try_escape = random.randint(1, 20) + SPD
+                enemy_try = random.randint(1, 20) + enemies[0].SPD
+                if try_escape > enemy_try:
+                    enemies = []
+                    print("Got away!")
+                else:
+                    print("Couldn't get away. . .")
+                    enemy_attack(enemies)
+
         if HP > 0:
             game_state = "playing"
             look()
