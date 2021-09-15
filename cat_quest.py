@@ -24,9 +24,10 @@ class Item:
     
 
 class Weapon(Item):
-    def __init__(self, id, value, bonus):
+    def __init__(self, id, value, bonus, damage):
         super().__init__(id, value)
         self.bonus = bonus
+        self.damage = damage
 
     def equip_weapon(self, weapon):
         global equip
@@ -118,7 +119,7 @@ class Room:
         return self.roomID
 
 class Mob:
-    def __init__(self, ID, HP, STR, CON, SPD, XP, money):
+    def __init__(self, ID, HP, STR, CON, SPD, XP, money, damage):
         self.ID = ID
         self.HP = HP
         self.STR = STR
@@ -126,6 +127,7 @@ class Mob:
         self.SPD = SPD
         self.XP = XP
         self.money = money
+        self.damage = damage
     def __repr__(self):
         return self.ID
 
@@ -462,7 +464,7 @@ def update_attack():
 
 def update_HP_total():
     global HP_max
-    HP_max = 1 + (3 * CON)
+    HP_max = 1 + (5 * CON)
 
 def random_encounter_check():
     global game_state
@@ -504,9 +506,10 @@ def player_attack(target):
     global STR
     global XP
     global GP
+    global equip
     roll = random.randint(1, 20) + ATK_bonus
     if roll >= 10 + target.SPD:
-        damage = WPN_bonus + STR
+        damage = random.randint(1, equip["Weapon"].damage+1) + STR
         target.HP -= damage
         print("Did {} damage to {} ({} left)".format(damage, target, target.HP))
         if target.HP <= 0:
@@ -525,7 +528,7 @@ def enemy_attack(attacker):
     for enemy in enemies:
         roll = random.randint(1,20) + enemy.STR
         if roll >= 10 + SPD:
-            damage = STR - ARM
+            damage = random.randint(1, enemy.damage) - ARM
             if damage < 0:
                 damage = 0
             print("{} did {} damage to you!".format(enemy, damage))
@@ -602,19 +605,19 @@ def you_win():
     game_state = "victory"
 
 #enemy objects go here
-ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25)
-mean_bird = Mob("mean_bird", 8, 5, 5, 5, 50, 50)
-mega_rat = Mob("mega_rat", 12, 8, 8, 8, 125, 125)
-human = Mob("human", 50, 14, 10, 10, 500, 1000)
-sphinx = Mob("sphinx", 100, 30, 30, 30, 1000, 1000)
+ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25, 4)
+mean_bird = Mob("mean_bird", 8, 5, 5, 5, 50, 50, 6)
+mega_rat = Mob("mega_rat", 12, 8, 8, 8, 125, 125, 8)
+human = Mob("human", 50, 14, 10, 10, 500, 1000, 12)
+sphinx = Mob("sphinx", 100, 30, 30, 30, 1000, 1000, 20)
 
 
 #item objects go here
 potion = Item("potion", 50)
 #weapons
-mega_sword = Weapon("mega_sword", 200, 10)
-sword = Weapon("sword", 100, 5)
-stick = Weapon("stick", 5, 1)
+mega_sword = Weapon("mega_sword", 200, 10, 12)
+sword = Weapon("sword", 100, 5, 8)
+stick = Weapon("stick", 5, 1, 4)
 #armor
 cat_armor = Armor("cat_armor", 100, 2)
 super_armor = Armor("super_armor", 150, 4)
