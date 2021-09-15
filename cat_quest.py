@@ -469,9 +469,10 @@ def update_HP_total():
 def random_encounter_check():
     global game_state
     chance = random.randint(1, 100)
-    if chance >= 80:
-        print("RANDOM ENCOUNTER! TIME TO FIGHT!")
-        random_encounter()
+    if not floor == 3:
+        if chance >= 80:
+            print("RANDOM ENCOUNTER! TIME TO FIGHT!")
+            random_encounter()
 
 def random_encounter():
     global floor
@@ -578,9 +579,11 @@ def game_restart():
     global equip
     global current_room
     global player_coords
+    global floor
     game_state = "playing"
     enemies = []
     player_coords = [3, 4]
+    floor = 1
     WPN_bonus = 1
     ATK_effect = 0
     ATK_bonus = 0
@@ -599,10 +602,78 @@ def game_restart():
     current_room = None
     get_room(player_coords, floor)
     look()
+    bed.items = [potion]
+    bathroom.items = [cat_armor]
+    armory.items = [sword]
 
 def you_win():
     global game_state
     game_state = "victory"
+
+def map():
+    global floor
+    if floor == 1:
+        rooms1 = [stairs1, cat_tree1, shop1, hallway3, armory, secret_chamber, closet, hallway2, hallway1, dungeon, bed, bathroom]
+        dots1 = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+
+        for num in range(len(rooms1)):
+            if current_room == rooms1[num-1]:
+                dots1[num-1] = "@"
+            elif rooms1[num-1].visited:
+                dots1[num-1] = "O"
+            else:
+                dots1[num-1] = "-"
+
+        floor1_map = """----{}-{}-{}
+------{}-{}
+--{}-{}-{}--
+------{}--
+------{}-{}
+------{}--""".format(dots1[0], dots1[1], dots1[2], dots1[3], dots1[4], dots1[5], dots1[6], dots1[7], dots1[8], dots1[9], dots1[10], dots1[11])
+        print(floor1_map)
+
+    elif floor == 2:
+        rooms2 = [stairs2, maze1, maze3, maze2, owl_room1, maze4, trap_room, maze5, maze6, scratch_post, maze7, maze8, maze9, maze, shop2, cat_tree2, key_room1, cactus_room1, stairs3, cactus2]
+        dots2 = ["-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
+
+        for num in range(len(rooms2)):
+            if current_room == rooms2[num-1]:
+                dots2[num-1] = "@"
+            elif rooms2[num-1].visited:
+                dots2[num-1] = "O"
+            else:
+                dots2[num-1] = "-"
+
+        floor2_map = """{}-{}-{}--
+{}-{}-{}-{}
+{}-{} {}-{}
+--{} {} {}
+{}-{}-{} {}
+----{}-{}""".format(dots2[0], dots2[1], dots2[2], dots2[3], dots2[4], dots2[5], dots2[6], dots2[7], dots2[8], dots2[9], dots2[10], dots2[11], dots2[12], dots2[13], dots2[14], dots2[15], dots2[16], dots2[17], dots2[18], dots2[19])
+        print(floor2_map)
+
+    elif floor == 3:
+        rooms3 = [food, boss, trial3, trial2, trial1, owl_room2, shop3, stairs4]
+        dots3 = ["-", "-", "-", "-", "-", "-", "-", "-"]
+
+        for num in range(len(rooms3)):
+            if current_room == rooms3[num-1]:
+                dots3[num-1] = "@"
+            elif rooms3[num-1].visited:
+                dots3[num-1] = "O"
+            else:
+                dots3[num-1] = "-"
+
+        floor3_map = """--{}--
+--{}--
+--{}--
+--{}--
+--{}--
+--{}-{}
+--{}--
+""".format(dots3[0], dots3[1], dots3[2], dots3[3], dots3[4], dots3[5], dots3[6], dots3[7])
+        print(floor3_map)
+
 
 #enemy objects go here
 ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25, 4)
@@ -788,6 +859,9 @@ while game_running:
 
         elif doing == "look" or doing == "l":
             look()
+
+        elif doing == "map":
+            map()
 
         elif doing == "shop":
             if not current_room.shop == None:
