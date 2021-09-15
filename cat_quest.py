@@ -600,11 +600,13 @@ def game_restart():
     equip = {"Weapon": stick, "Armor": None, "Accessory": None}
     floor = 1
     current_room = None
+    title_graphic()
     get_room(player_coords, floor)
     look()
     bed.items = [potion]
     bathroom.items = [cat_armor]
     armory.items = [sword]
+    
 
 def you_win():
     global game_state
@@ -675,6 +677,19 @@ def map():
         print(floor3_map)
 
 
+def title_graphic():
+    graphic = """    _______  _______ _________   _______           _______  _______ _________
+   (  ____ \(  ___  )\__   __/  (  ___  )|\     /|(  ____ \(  ____ \\__   __/
+   | (    \/| (   ) |   ) (     | (   ) || )   ( || (    \/| (    \/   ) (   
+   | |      | (___) |   | |     | |   | || |   | || (__    | (_____    | |   
+   | |      |  ___  |   | |     | |   | || |   | ||  __)   (_____  )   | |   
+   | |      | (   ) |   | |     | | /\| || |   | || (            ) |   | |   
+   | (____/\| )   ( |   | |     | (_\ \ || (___) || (____/\/\____) |   | |   
+   (_______/|/     \|   )_(     (____\/_)(_______)(_______/\_______)   )_(   
+                                                                             
+"""
+    print(graphic)
+
 #enemy objects go here
 ghost_dog = Mob("ghost_dog", 5, 3, 3, 3, 25, 25, 4)
 mean_bird = Mob("mean_bird", 8, 5, 5, 5, 50, 50, 6)
@@ -702,6 +717,7 @@ cute_collar = Accessory("cute_collar", 100, "ATK_up")
 shop1 = Shop("shop1", [potion, cute_collar])
 shop2 = Shop("shop2", [potion, super_armor])
 shop3 = Shop("shop3", [potion, mega_armor, mega_sword])
+
 #floor 1
 bed = Room("bed", False, False, False, True, False, False, [potion])
 dungeon = Room("dungeon", True, True, True, False, False, False)
@@ -770,6 +786,7 @@ inventory = []
 equip = {"Weapon": stick, "Armor": None, "Accessory": None}
 floor = 1
 current_room = None
+title_graphic()
 get_room(player_coords, floor)
 look()
 game_running = True
@@ -903,9 +920,10 @@ while game_running:
             print("character (cha) - displays character sheet")
             print("nap - naps to restore health to full in cat tree rooms")
             print("shop - opens shopping menu in rooms with shops")
+            print("map - displays map and current position")
 
                 
-        #TEST COMMANDS: REMOVE THESE LATER!!
+        #TEST COMMANDS: REMOVE THESE LATER!! nahh
         elif "OP_giveXP" in doing:
             tag = doing.split()
             if len(tag) == 1:
